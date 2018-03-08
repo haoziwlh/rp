@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- scan 为true表示动态加载该配置文件，每60秒扫描一次  debug表示是否显示logback内部日志 -->
+<configuration scan="false" debug="false">
+
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+  <!-- 控制台输出日志 -->
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <layout class="ch.qos.logback.classic.PatternLayout">
+       <!-- 级别 日期 完整类名 线程名 文件名：行数 消息 回车 -->
+      <pattern>[%level] %d{yyyy-MM-dd HH:mm:ss SSS} [%logger] [%thread] \(%F:%L\) -> %msg%n</pattern>
+    </layout>
+  </appender>
+  
+  <appender name="debug" class="ch.qos.logback.core.rolling.RollingFileAppender">   
+    <file>log/rp/debug/debugrp.log</file>
+    <!-- 仅接收debug级别日志 -->   
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">   
+      <level>DEBUG</level>   
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>   
+    </filter>
+    <!-- 最多200个文件，最小1个文件-->
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">   
+      <fileNamePattern>log/rp/debug/debugrp.log.%i</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>200</maxIndex>
+    </rollingPolicy>
+    <!-- 每个文件最大5M -->
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">   
+      <maxFileSize>5MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>   
+      <pattern>[%level] %d{yyyy-MM-dd HH:mm:ss SSS} [%logger] [%thread] \(%F:%L\) -> %msg%n</pattern>   
+    </encoder>   
+  </appender>
+  
+  <appender name="info" class="ch.qos.logback.core.rolling.RollingFileAppender">   
+    <file>log/rp/info/inforp.log</file>   
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">   
+      <level>INFO</level>   
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>   
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">   
+      <fileNamePattern>log/rp/info/inforp.log.%d{yyyy-MM-dd}</fileNamePattern>   
+      <!--<maxHistory>30</maxHistory>-->
+    </rollingPolicy> 
+    <encoder>
+      <pattern>[${HOSTINFO}] [%level] %d{yyyy-MM-dd HH:mm:ss SSS} [%logger] [%thread] \(%F:%L\) -> %msg%n</pattern>   
+    </encoder>   
+  </appender>
+  
+  <appender name="warn" class="ch.qos.logback.core.rolling.RollingFileAppender">   
+    <file>log/rp/warn/warnrp.log</file>   
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">   
+      <level>WARN</level>   
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>   
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>log/rp/warn/warnrp.log.%d{yyyy-MM-dd}</fileNamePattern>   
+      <!--<maxHistory>30</maxHistory>-->   
+    </rollingPolicy> 
+    <encoder>
+      <pattern>[%level] %d{yyyy-MM-dd HH:mm:ss SSS} [%logger] [%thread] \(%F:%L\) -> %msg%n</pattern>   
+    </encoder>   
+  </appender>
+  
+  <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>log/rp/error/errorrp.log</file>   
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">   
+      <level>ERROR</level>   
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>   
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">   
+      <fileNamePattern>log/rp/error/errorrp.log.%d{yyyy-MM-dd}</fileNamePattern>   
+      <!--<maxHistory>30</maxHistory>-->   
+    </rollingPolicy> 
+    <encoder>
+      <pattern>[%level] %d{yyyy-MM-dd HH:mm:ss SSS} [%logger] [%thread] \(%F:%L\) -> %msg%n</pattern>   
+    </encoder>   
+  </appender>
+  
+  <logger name="io.netty" level="ERROR" />
+  
+  <root>
+  	<appender-ref ref="debug" level="DEBUG"/>
+  	<appender-ref ref="info" level="INFO" /> 
+  	<appender-ref ref="warn" level="WARN" />
+  	<appender-ref ref="error" level="ERROR" />
+  </root>
+</configuration>
