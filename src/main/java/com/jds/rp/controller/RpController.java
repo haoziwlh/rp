@@ -105,7 +105,7 @@ public class RpController {
 			Verify.verify(type >= 0 && type <= 1, "type is not allowed");
 			int rpId = userService.sendRp(uid, amt, memo, type, num);
 			if(rpId == 0) {
-				ret = Ret.buildError("红包发送失败");
+				ret = Ret.buildError("用户不存在或可用不足");
 			}else {
 				RetRedPacket retRedPacket = new RetRedPacket();
 				retRedPacket.setId(rpId);
