@@ -97,11 +97,12 @@ public class RpController {
 		int uid = ServletRequestUtils.getIntParameter(request, "uid", 0);
 		int amt = ServletRequestUtils.getIntParameter(request, "amt", 0);
 		int num = ServletRequestUtils.getIntParameter(request, "num", 0);
-		int type = ServletRequestUtils.getIntParameter(request, "type", 1);
+		int type = ServletRequestUtils.getIntParameter(request, "type", 0);
 		String memo = ServletRequestUtils.getStringParameter(request, "memo", null);
 		logger.info("recv sendRp > uid {}, amt {}, num {}, type {}, memo {}", uid, amt, num, type, memo);
 		try {
 			Verify.verify(uid > 0, "uid is not allowed");
+			Verify.verify(type >= 0 && type <= 1, "type is not allowed");
 			int rpId = userService.sendRp(uid, amt, memo, type, num);
 			if(rpId == 0) {
 				ret = Ret.buildError("红包发送失败");

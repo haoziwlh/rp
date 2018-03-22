@@ -1,5 +1,6 @@
 package com.jds.rp.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,28 +110,41 @@ public class UserService {
 
 			@Override
 			public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
-				if(type == 1) {
+				if(type == 0) {
 					int value = amt / num;
+					ArrayList<byte[]> list = new ArrayList<>();
 					for(int i = 0;i < num; i++) {
 						int valueCopy = value;
 						if(i == num - 1) {
 							valueCopy = amt - i * value;
 						}
-						connection.lPush((KEYPREFIX + rid).getBytes(), String.valueOf(valueCopy).getBytes());
+						list.add(String.valueOf(valueCopy).getBytes());
 					}
-				}else if(type == 2) {
+					Long lPush = connection.lPush((KEYPREFIX + rid).getBytes(), list.toArray(new byte[0][]));
+					if(lPush <= 0) {
+						return false;
+					}
+				}else if(type == 1) {
 					int numCopy = num;
 					int amtCopy = amt;
 					Random random = new Random();
+					ArrayList<byte[]> list = new ArrayList<>();
 					while(numCopy > 1) {
 						int range = amtCopy - (numCopy - 1);
 						int value = 1; 
 						if(range > 1) {
 							value = random.nextInt(range) + 1;
 						}
-						connection.lPush((KEYPREFIX + rid).getBytes(), String.valueOf(value).getBytes());
+						list.add(String.valueOf(value).getBytes());
 						amtCopy -=  value;
 						numCopy -= 1;
+					}
+					if(amtCopy > 0) {
+						list.add(String.valueOf(amtCopy).getBytes());
+					}
+					Long lPush = connection.lPush((KEYPREFIX + rid).getBytes(), list.toArray(new byte[0][]));
+					if(lPush <= 0) {
+						return false;
 					}
 				}
 				return true;
@@ -193,6 +207,11 @@ public class UserService {
 			@Override
 			public RedPacketRecieveVo doInRedis(RedisConnection connection) throws DataAccessException {
 				byte[] num = connection.lPop((KEYPREFIX + rid).getBytes());
+				if(num == null) {
+					vo.setGet(false);
+					vo.setError("red packet not exists");
+					return vo;
+				}
 				int rpv = Integer.parseInt(new String(num));
 				int update = redPacketDao.update(rid, rpv);
 				if(update != 1) {
